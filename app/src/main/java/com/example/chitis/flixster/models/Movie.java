@@ -2,6 +2,10 @@ package com.example.chitis.flixster.models;
 
 import org.json.JSONObject;
 import org.json.JSONException;
+import org.parceler.Parcel;
+
+
+@Parcel
 
 public class Movie {
 
@@ -10,6 +14,8 @@ public class Movie {
     private String overview;
     private String posterPath; // only the path
     private String backdropPath;
+
+    public Movie() {}
 
     // initialize from the JSON data
     public Movie(JSONObject object) throws JSONException {

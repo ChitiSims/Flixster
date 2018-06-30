@@ -1,6 +1,7 @@
 package com.example.chitis.flixster;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -14,6 +15,8 @@ import com.example.chitis.flixster.models.Config;
 import com.example.chitis.flixster.models.GlideApp;
 import com.example.chitis.flixster.models.Movie;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
 
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
@@ -26,7 +29,6 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     Config config;
     // Context for rendering
     Context context;
-
 
 
     // initialize with list
@@ -54,7 +56,8 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         // return a new ViewHolder
         return new ViewHolder(movieView);
     }
-     // binds an inflated view to new item
+
+    // binds an inflated view to new item
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // get the movie data at the specified position
@@ -75,7 +78,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             imageUrl = config.getImageUrl(config.getPosterSize(), movie.getPosterPath());
         } else {
             // load the backdrop image
-            imageUrl = config.getImageUrl(config.getBackdropSize(),movie.getBackdropPath());
+            imageUrl = config.getImageUrl(config.getBackdropSize(), movie.getBackdropPath());
         }
 
         // get the correct placeholder and imageview for the current orientation
@@ -85,7 +88,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
         // load image using glide
         GlideApp.with(context)
                 .load(imageUrl)
-                .transform(new RoundedCornersTransformation(25,0))
+                .transform(new RoundedCornersTransformation(25, 0))
                 .placeholder(placeholderId)
                 .error(placeholderId)
                 .override(300, 200)
@@ -93,6 +96,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
 
 
     }
+
     // returns the total number of items in the list
     @Override
     public int getItemCount() {
@@ -100,7 +104,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
     }
 
     // create the viewholder as a static inner class
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         // track view objects
         ImageView ivPosterImage;
@@ -115,6 +119,26 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.ViewHolder> 
             ivBackdropImage = (ImageView) itemView.findViewById(R.id.ivBackdropImage);
             tvOverview = (TextView) itemView.findViewById(R.id.tvOverview);
             tvTitle = (TextView) itemView.findViewById(R.id.tvTitle);
+
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            // gets item position
+            int position = getAdapterPosition();
+            // make sure the position is valid, i.e. actually exists in the view
+            if (position != RecyclerView.NO_POSITION) {
+                // get the movie at the position, this won't work if the class is static
+                Movie movie = movies.get(position);
+                // create intent for the new activity
+                Intent intent = new Intent(context, MovieDetailsActivity.class);
+                // serialize the movie using parceler, use its short name as a key
+                intent.putExtra(Movie.class.getSimpleName(), Parcels.wrap(movie));
+                // show the activity
+                context.startActivity(intent);
+            }
+
         }
     }
 }
